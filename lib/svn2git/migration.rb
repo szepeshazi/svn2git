@@ -178,7 +178,7 @@ module Svn2Git
         run_command(cmd)
       end
 
-      run_command("git config --local svn.authorsfile #{authors}") unless authors.nil?
+      run_command("git config svn.authorsfile #{authors}") unless authors.nil?
 
       cmd = "git svn fetch "
       unless revision.nil?
@@ -215,8 +215,8 @@ module Svn2Git
 
     def fix_tags
       current = {}
-      current['user.name']  = run_command("git config --local --get user.name", false)
-      current['user.email'] = run_command("git config --local --get user.email", false)
+      current['user.name']  = run_command("git config --get user.name", false)
+      current['user.email'] = run_command("git config --get user.email", false)
 
       @tags.each do |tag|
         tag = tag.strip
@@ -225,8 +225,8 @@ module Svn2Git
         date    = run_command("git log -1 --pretty=format:'%ci' '#{escape_quotes(tag)}'")
         author  = run_command("git log -1 --pretty=format:'%an' '#{escape_quotes(tag)}'")
         email   = run_command("git log -1 --pretty=format:'%ae' '#{escape_quotes(tag)}'")
-        run_command("git config --local user.name '#{escape_quotes(author)}'")
-        run_command("git config --local user.email '#{escape_quotes(email)}'")
+        run_command("git config user.name '#{escape_quotes(author)}'")
+        run_command("git config user.email '#{escape_quotes(email)}'")
         run_command("GIT_COMMITTER_DATE='#{escape_quotes(date)}' git tag -a -m '#{escape_quotes(subject)}' '#{escape_quotes(id)}' '#{escape_quotes(tag)}'")
         run_command("git branch -d -r '#{escape_quotes(tag)}'")
       end
@@ -238,9 +238,9 @@ module Svn2Git
           # If a line was read, then there was a config value so restore it.
           # Otherwise unset the value because originally there was none.
           if value.strip != ''
-            run_command("git config --local #{name} '#{value.strip}'")
+            run_command("git config #{name} '#{value.strip}'")
           else
-            run_command("git config --local --unset #{name}")
+            run_command("git config --unset #{name}")
           end
         end
       end
